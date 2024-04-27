@@ -96,6 +96,20 @@ async def create_author(request: Request):
     return {"id": last_record_id}
 
 
+@app.get("/authors/")
+async def get_all_authors():
+    """Fetch all books
+    TODO: Add pagination
+    """
+    query = authors.select()
+    return await database.fetch_all(query=query)
+
+
+@app.get("/author/{author_id}")
+async def get_author(author_id: int):
+    pass
+
+
 @app.post("/book/")
 async def create_book(request: Request):
     """
