@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 from fastapi import FastAPI, Request
+
 import databases
 import sqlalchemy
 
@@ -24,6 +25,7 @@ books = sqlalchemy.Table(
     sqlalchemy.Column(
         "author_id", sqlalchemy.Integer, sqlalchemy.ForeignKey("authors.id")
     ),
+    sqlalchemy.Column("props", sqlalchemy.JSON()),
 )
 
 authors = sqlalchemy.Table(
@@ -31,6 +33,14 @@ authors = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String(length=60)),
+)
+
+users = sqlalchemy.Table(
+    "users",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("first_name", sqlalchemy.String(length=60)),
+    sqlalchemy.Column("last_name", sqlalchemy.String(length=60)),
 )
 
 metadata.create_all()
@@ -152,3 +162,22 @@ async def update_book(request: Request):
 @app.get("/books/{book_id}")
 async def get_book(book_id: int):
     pass
+
+
+@app.post("/user/")
+async def create_user(request: Request):
+    """
+    Create a new user in the database.
+
+    This function handles the HTTP POST request to the "/book/" endpoint. It expects a JSON payload in the request body containing the data for the new book. The function inserts the book data into the "books" table using the SQLAlchemy ORM and returns the ID of the newly created record.
+
+    Parameters:
+        - request (Request): The HTTP request object containing the book data.
+
+    Returns:
+        - dict: A dictionary containing the ID of the newly created book.
+    """
+    data = await request.json()
+    query = users.insert().values(**data)
+    last_record_id = await database.execute(query=query)
+    return {"id": last_record_id}
