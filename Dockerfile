@@ -1,31 +1,17 @@
-# Use the official Python image as a base image
-FROM python:3.7.13
+#
+FROM python:3.9
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+#
+WORKDIR /code
 
-# Set the working directory in the container
-WORKDIR /app
+#
+COPY ./requirements.txt /code/requirements.txt
 
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        gcc \
-        libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+#
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-# Copy the requirements file into the container at /app
-COPY requirements.txt /app/
+#
+COPY ./app /code/app
 
-# Install any dependencies specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Install uvicorn explicitly
-RUN pip install uvicorn
-
-# Copy the rest of the application code into the container
-COPY . /app/
-
-# Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+#
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]

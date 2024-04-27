@@ -1,7 +1,8 @@
 version: '3.8'
 
 services:
-  postgres:
+
+  db:
     image: postgres:latest
     restart: always
     ports:
@@ -17,6 +18,6 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
+      - db
     environment:
-      DATABASE_URL: postgresql://postgres:testqa@postgres:5432/store
+      DATABASE_URL: postgresql://postgres:testqa@db:5432/store
