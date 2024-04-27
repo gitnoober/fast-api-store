@@ -21,19 +21,22 @@ books = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("title", sqlalchemy.String(length=255)),
-    sqlalchemy.Column("author_id", sqlalchemy.Integer, sqlalchemy.ForeignKey("authors.id")),
+    sqlalchemy.Column(
+        "author_id", sqlalchemy.Integer, sqlalchemy.ForeignKey("authors.id")
+    ),
 )
 
 authors = sqlalchemy.Table(
     "authors",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("name", sqlalchemy.String(length=60))
+    sqlalchemy.Column("name", sqlalchemy.String(length=60)),
 )
 
 metadata.create_all()
 
 app = FastAPI()
+
 
 @app.on_event("startup")
 async def startup():
@@ -49,8 +52,8 @@ async def startup():
         None
     """
     await database.connect()
-    
-    
+
+
 @app.on_event("shutdown")
 async def shutdown():
     """
@@ -110,7 +113,8 @@ async def create_book(request: Request):
     query = books.insert().values(**data)
     last_record_id = await database.execute(query=query)
     return {"id": last_record_id}
-    
+
+
 @app.put("/book/")
 async def update_book(request: Request):
     """
@@ -131,10 +135,6 @@ async def update_book(request: Request):
     return {"id": last_record_id}
 
 
-
 @app.get("/books/{book_id}")
 async def get_book(book_id: int):
     pass
-
-
-
